@@ -4,7 +4,8 @@ class Code:
         pass
 
     def dest(self, s):
-        d_dest = {'null': '000', 'M': '001', 'D': '010', 'MD': '011', 'A': '100', 'AM': '101', 'AD': '110', 'AMD': '111'}
+        d_dest = {'null': '000', 'M': '001', 'D': '010', 'MD': '011',
+                  'A': '100', 'AM': '101', 'AD': '110', 'AMD': '111'}
         return d_dest[s]
 
     def comp(self, s):
@@ -17,5 +18,6 @@ class Code:
         return d_comp[s]
 
     def jump(self, s):
-        d_jump = {'null': '000', 'JGT': '001', 'JEQ': '010', 'JGE': '011', 'JLT': '100', 'JNE': '101', 'JLE': '110', 'JMP': '111'}
+        d_jump = {'null': '000', 'JGT': '001', 'JEQ': '010', 'JGE': '011',
+                  'JLT': '100', 'JNE': '101', 'JLE': '110', 'JMP': '111'}
         return d_jump[s]

@@ -9,11 +9,11 @@ class Parser:
                 continue
             else:
                 pass
-            # some cleaning
+            # * Cleaning lin
             if '//' in line:
                 line = line[:line.find('//')]
             line = line.replace(" ", "")
-            # create clean lines
+            # * Create clean lines
             l = []
             for ch in line:
                 if ch not in ['', '\n']:
