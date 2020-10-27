@@ -1,4 +1,5 @@
-// boostrap
+// Juan Manuel Young Hoyos
+
 @256
 D=A
 @SP
