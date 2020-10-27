@@ -101,7 +101,8 @@ class Parser:
         elif self.commandType() == 'C_RETURN':
             pass
         else:
-            raise ValueError("Unrecognized command type when trying to obtain arg1")
+            raise ValueError(
+                "Unrecognized command type when trying to obtain arg1")
 
     def arg2(self):
         if self.commandType() in ['C_PUSH', 'C_POP']:

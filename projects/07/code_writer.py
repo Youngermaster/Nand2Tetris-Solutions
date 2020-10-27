@@ -12,62 +12,63 @@ class CodeWriter:
         self.filename = self.writefile + '.asm'
         self.file = open(self.filename, 'w')
         self.writefile_ind = self.writefile.rfind('/')
-        self.static_var = self.writefile[self.writefile_ind + 1:]   # useful in declaring static variables
+        # * Useful in declaring static variables
+        self.static_var = self.writefile[self.writefile_ind + 1:]
 
     def writePushPop(self):   # no need to pass in command as an argument
         assert self.parser.commandType() in ['C_PUSH', 'C_POP']
         arg1 = self.parser.arg1()
         arg2 = self.parser.arg2()
         if self.parser.commandType() == 'C_PUSH':
-                # stack operation
-                if arg1 == 'constant':
-                    # e.g. push constant 7
-                    self.file.write('@%s\n' % arg2)
-                    self.file.write('D=A\n')    # D = 7
-                    self.file.write('@SP\n')
-                    self.file.write('A=M\n')
-                    self.file.write('M=D\n')    # M[M[base_address]] = 7
-                elif arg1 in ['temp', 'pointer', 'local', 'argument', 'this', 'that']:
-                    self.file.write('@%s\n' % arg2)
-                    self.file.write('D=A\n')
-                    if arg1 == 'temp':
-                        self.file.write('@5\n')
-                        self.file.write('A=D+A\n')
-                    elif arg1 == 'pointer':
-                        self.file.write('@3\n')
-                        self.file.write('A=D+A\n')
-                    elif arg1 == 'local':
-                        self.file.write('@LCL\n')
-                        self.file.write('A=D+M\n')
-                    elif arg1 == 'argument':
-                        self.file.write('@ARG\n')
-                        self.file.write('A=D+M\n')
-                    elif arg1 == 'this':
-                        self.file.write('@THIS\n')
-                        self.file.write('A=D+M\n')
-                    elif arg1 == 'that':
-                        self.file.write('@THAT\n')
-                        self.file.write('A=D+M\n')
-                    else:
-                        pass
-                    self.file.write('D=M\n')
-                    self.file.write('@SP\n')
-                    self.file.write('A=M\n')
-                    self.file.write('M=D\n')
-                elif arg1 == 'static':
-                    # declare a new symbol file.j in "push static j"
-                    self.file.write('@%s.%s\n' % (self.static_var, arg2))
-                    self.file.write('D=M\n')
-                    # push D's value to the stack
-                    self.file.write('@SP\n')
-                    self.file.write('A=M\n')
-                    self.file.write('M=D\n')
-                else:
-                    # TODO
-                    pass
-                # increase address of stack top
+            # stack operation
+            if arg1 == 'constant':
+                # e.g. push constant 7
+                self.file.write('@%s\n' % arg2)
+                self.file.write('D=A\n')    # D = 7
                 self.file.write('@SP\n')
-                self.file.write('M=M+1\n')  # M[base_address] = M[base_address] + 1
+                self.file.write('A=M\n')
+                self.file.write('M=D\n')    # M[M[base_address]] = 7
+            elif arg1 in ['temp', 'pointer', 'local', 'argument', 'this', 'that']:
+                self.file.write('@%s\n' % arg2)
+                self.file.write('D=A\n')
+                if arg1 == 'temp':
+                    self.file.write('@5\n')
+                    self.file.write('A=D+A\n')
+                elif arg1 == 'pointer':
+                    self.file.write('@3\n')
+                    self.file.write('A=D+A\n')
+                elif arg1 == 'local':
+                    self.file.write('@LCL\n')
+                    self.file.write('A=D+M\n')
+                elif arg1 == 'argument':
+                    self.file.write('@ARG\n')
+                    self.file.write('A=D+M\n')
+                elif arg1 == 'this':
+                    self.file.write('@THIS\n')
+                    self.file.write('A=D+M\n')
+                elif arg1 == 'that':
+                    self.file.write('@THAT\n')
+                    self.file.write('A=D+M\n')
+                else:
+                    pass
+                self.file.write('D=M\n')
+                self.file.write('@SP\n')
+                self.file.write('A=M\n')
+                self.file.write('M=D\n')
+            elif arg1 == 'static':
+                # declare a new symbol file.j in "push static j"
+                self.file.write('@%s.%s\n' % (self.static_var, arg2))
+                self.file.write('D=M\n')
+                # push D's value to the stack
+                self.file.write('@SP\n')
+                self.file.write('A=M\n')
+                self.file.write('M=D\n')
+            else:
+                # TODO
+                pass
+            # increase address of stack top
+            self.file.write('@SP\n')
+            self.file.write('M=M+1\n')  # M[base_address] = M[base_address] + 1
 
         elif self.parser.commandType() == 'C_POP':
             # pop the stack value and store it in segment[index]
@@ -153,13 +154,15 @@ class CodeWriter:
             self.file.write('D=M\n')
             self.file.write('A=A-1\n')
             self.file.write('D=M-D\n')
-            self.file.write('@IF_TRUE_%s\n' % self.parser.i)  # there could be more than one 'eq' command
+            # there could be more than one 'eq' command
+            self.file.write('@IF_TRUE_%s\n' % self.parser.i)
             self.file.write('D;JEQ\n')
             self.file.write('@SP\n')
             self.file.write('A=M-1\n')
             self.file.write('A=A-1\n')
             self.file.write('M=0\n')
-            self.file.write('@END_%s\n' % self.parser.i)  # there could be more than one 'eq' command
+            # there could be more than one 'eq' command
+            self.file.write('@END_%s\n' % self.parser.i)
             self.file.write('0;JMP\n')
             self.file.write('(IF_TRUE_%s)\n' % self.parser.i)
             self.file.write('@SP\n')
@@ -177,13 +180,15 @@ class CodeWriter:
             self.file.write('D=M\n')
             self.file.write('A=A-1\n')
             self.file.write('D=M-D\n')
-            self.file.write('@IF_TRUE_%s\n' % self.parser.i)  # there could be more than one 'gt' command
+            # there could be more than one 'gt' command
+            self.file.write('@IF_TRUE_%s\n' % self.parser.i)
             self.file.write('D;JGT\n')
             self.file.write('@SP\n')
             self.file.write('A=M-1\n')
             self.file.write('A=A-1\n')
             self.file.write('M=0\n')
-            self.file.write('@END_%s\n' % self.parser.i)  # there could be more than one 'gt' command
+            # there could be more than one 'gt' command
+            self.file.write('@END_%s\n' % self.parser.i)
             self.file.write('0;JMP\n')
             self.file.write('(IF_TRUE_%s)\n' % self.parser.i)
             self.file.write('@SP\n')
@@ -201,13 +206,15 @@ class CodeWriter:
             self.file.write('D=M\n')
             self.file.write('A=A-1\n')
             self.file.write('D=M-D\n')
-            self.file.write('@IF_TRUE_%s\n' % self.parser.i)  # there could be more than one 'lt' command
+            # there could be more than one 'lt' command
+            self.file.write('@IF_TRUE_%s\n' % self.parser.i)
             self.file.write('D;JLT\n')
             self.file.write('@SP\n')
             self.file.write('A=M-1\n')
             self.file.write('A=A-1\n')
             self.file.write('M=0\n')
-            self.file.write('@END_%s\n' % self.parser.i)  # there could be more than one 'lt' command
+            # there could be more than one 'lt' command
+            self.file.write('@END_%s\n' % self.parser.i)
             self.file.write('0;JMP\n')
             self.file.write('(IF_TRUE_%s)\n' % self.parser.i)
             self.file.write('@SP\n')
@@ -251,7 +258,8 @@ class CodeWriter:
             self.file.write('M=!M\n')
 
         else:
-            raise ValueError("Unrecognized command for C_ARITHMETIC command type")
+            raise ValueError(
+                "Unrecognized command for C_ARITHMETIC command type")
 
     def createOutput(self):
         # initially set the SP address to 256 (the address for the stack)
